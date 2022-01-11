@@ -5,6 +5,8 @@ import com.example.mytranslator.models.Word;
 import com.example.mytranslator.repositories.WordTranslatorRepository;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class WordTranslatorController {
 
@@ -28,5 +30,25 @@ public class WordTranslatorController {
     @PostMapping(path = "translate/word/{language}/{word}")
     public boolean addDefinitionForWord(@PathVariable String word, @PathVariable String language, @RequestBody Definition definition){
         return wordTranslatorRepository.addDefinitionForWord(word, language, definition);
+    }
+
+    @DeleteMapping(path = "translate/word/{language}/{word}/{dictionary}")
+    public boolean removeDefinition(@PathVariable String word, @PathVariable String language, @PathVariable String dictionary){
+        return wordTranslatorRepository.removeDefinition(word, language, dictionary);
+    }
+
+    @GetMapping(path = "translate/word/{word}/{fromLanguage}/{toLanguage}")
+    public String translateWord(@PathVariable String word, @PathVariable String fromLanguage, @PathVariable String toLanguage) {
+        return wordTranslatorRepository.translateWord(word, fromLanguage, toLanguage);
+    }
+
+    @GetMapping(path = "translate/sentence/{sentence}/{fromLanguage}/{toLanguage}")
+    public String translateSentence(@PathVariable String sentence, @PathVariable String fromLanguage, @PathVariable String toLanguage) {
+        return wordTranslatorRepository.translateSentence(sentence, fromLanguage, toLanguage);
+    }
+
+    @GetMapping(path = "translate/definitions/{word}/{language}")
+    public List<Definition> getDefinitionForWord(@PathVariable String word, @PathVariable String language) {
+        return wordTranslatorRepository.getDefinitionsForWord(word, language);
     }
 }

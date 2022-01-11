@@ -1,9 +1,11 @@
 package com.example.mytranslator.models;
 
 import com.google.gson.Gson;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 
+@EqualsAndHashCode
 public class Definition {
     public String dict;
     public String dictType;
