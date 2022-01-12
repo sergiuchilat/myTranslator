@@ -14,7 +14,7 @@ public class WordTranslatorController {
 
     @GetMapping(path = "translate/word/{language}/{word}")
     public String translateWord(@PathVariable String word, @PathVariable String language){
-        return wordTranslatorRepository.translateWord(word, language);
+        return wordTranslatorRepository.getWordModel(word, language);
     }
 
     @PostMapping(path = "translate/word/{language}")
@@ -39,7 +39,7 @@ public class WordTranslatorController {
 
     @GetMapping(path = "translate/word/{word}/{fromLanguage}/{toLanguage}")
     public String translateWord(@PathVariable String word, @PathVariable String fromLanguage, @PathVariable String toLanguage) {
-        return wordTranslatorRepository.translateWord(word, fromLanguage, toLanguage);
+        return wordTranslatorRepository.getWordModel(word, fromLanguage, toLanguage);
     }
 
     @GetMapping(path = "translate/sentence/{sentence}/{fromLanguage}/{toLanguage}")
@@ -50,5 +50,15 @@ public class WordTranslatorController {
     @GetMapping(path = "translate/definitions/{word}/{language}")
     public List<Definition> getDefinitionForWord(@PathVariable String word, @PathVariable String language) {
         return wordTranslatorRepository.getDefinitionsForWord(word, language);
+    }
+
+    @GetMapping(path = "translate/sentence-with-synonyms/{sentence}/{fromLanguage}/{toLanguage}")
+    public List<String> translateSentenceWithSynonyms(@PathVariable String sentence, @PathVariable String fromLanguage, @PathVariable String toLanguage) {
+        return wordTranslatorRepository.translateSentenceWithSynonyms(sentence, fromLanguage, toLanguage);
+    }
+
+    @GetMapping(path = "export/{language}")
+    public void exportJson(@PathVariable String language) {
+        wordTranslatorRepository.exportJson(language);
     }
 }
