@@ -8,7 +8,6 @@ import java.util.Set;
 
 public class Word {
     public String word;
-    public Map<String, String> translations;
     public String word_en;
     public String type;
     public ArrayList<String> singular;

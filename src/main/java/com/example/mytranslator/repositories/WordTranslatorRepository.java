@@ -1,9 +1,7 @@
 package com.example.mytranslator.repositories;
 
 import com.example.mytranslator.models.Definition;
-import com.example.mytranslator.models.JsonWord;
 import com.example.mytranslator.models.Word;
-import com.example.mytranslator.models.JsonWordWrapper;
 import com.google.gson.Gson;
 
 import java.io.*;
@@ -16,6 +14,25 @@ import java.util.stream.Collectors;
 
 public class WordTranslatorRepository {
     private Gson gson = new Gson();
+
+    //reads json files to list
+    public List<Word> getWordsCollection(String path) {
+        List<Word> result = new ArrayList<>();
+        //creates object representation of directory
+        File directory = new File(path);
+        //iterates over all files inside directory
+        for(File file : directory.listFiles()) {
+            //checks if current File is a file
+            if(file.isFile()) {
+                //read word model from file
+                Word word = readWordModel(file.getPath());
+                //adds to list
+                result.add(word);
+            }
+        }
+        return result;
+    }
+
     //gets word model for requested word and language
     public String getWordModel(String word, String language){
         Word model = readWordModel(getFilePath(word, language));
@@ -64,12 +81,12 @@ public class WordTranslatorRepository {
 
     //translates specified word
     public String translateWord(String word, String fromLanguage, String toLanguage) {
+        String result = null;
         Word wordModel = readWordModel(getFilePath(word, fromLanguage));
-//            if(toLanguage.equals("ro")) result = wordModel.word;
-//            if(toLanguage.equals("en")) result = wordModel.word_en;
-        String toLanguageKey = "word_" + toLanguage;
-        if (!wordModel.translations.containsKey(toLanguageKey)) return "word is not found";
-        return wordModel.translations.get(toLanguageKey);
+        if(toLanguage.equals("ro")) result = wordModel.word;
+        if(toLanguage.equals("en")) result = wordModel.word_en;
+        if(result == null) return "word is not found";
+        return result;
     }
 
     //translates sentence
@@ -95,7 +112,6 @@ public class WordTranslatorRepository {
                 .collect(Collectors.toList());  //collects all elements into list
     }
 
-    //translates sentence in different ways(using synonyms)
     public List<String> translateSentenceWithSynonyms(String sentence, String fromLanguage, String toLanguage) {
         int size = 3;
         //creates arraylist and initializes with string builders
@@ -112,7 +128,9 @@ public class WordTranslatorRepository {
             if(!Pattern.matches("\\p{IsPunctuation}", word) && !Pattern.matches("\\s", word)) {
                 Word model = readWordModel(getFilePath(word, fromLanguage));
                 //get translation of the current word
-                String translation = model.translations.get("word_" + toLanguage);
+                String translation = "";
+                if(toLanguage.equals("ro")) translation = model.word;
+                if(toLanguage.equals("en")) translation = model.word_en;
                 //read translated word's model
                 Word translatedWord = readWordModel(getFilePath(translation, toLanguage));
                 //container object to avoid null pointer exception
@@ -152,22 +170,18 @@ public class WordTranslatorRepository {
         try (FileWriter writer = new FileWriter(exportFile)){
             //creates new file in file system
             exportFile.createNewFile();
-            JsonWordWrapper jsonWordWrapper = new JsonWordWrapper();
             //read the entire directory for specified language
             File directory = new File("src/main/resources/translations/" + language);
             List<Word> words = new ArrayList<>();
             //iterate over files in the directory
             for(File file : directory.listFiles()) {
                 //read each file into model
-                words.add(readWordModel(file.getAbsolutePath()));
+                Word word = readWordModel(file.getAbsolutePath());
+                words.add(word);
             }
-            //converts each word to jsonword and add to jsonWordWrapper
-            for(Word word : words) {
-                JsonWord jsonWord = new JsonWord(word);
-                jsonWordWrapper.words.add(jsonWord);
-            }
-            //writes jsonWordWrapper to json file
-            gson.toJson(jsonWordWrapper, writer);
+            //sorts words
+            words.sort(Comparator.comparing(word -> word.word));
+            gson.toJson(words, writer);
         } catch (IOException e) {
             e.printStackTrace();
         }

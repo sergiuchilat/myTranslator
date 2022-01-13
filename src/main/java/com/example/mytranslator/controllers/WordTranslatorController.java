@@ -11,6 +11,13 @@ import java.util.List;
 public class WordTranslatorController {
 
     private WordTranslatorRepository wordTranslatorRepository = new WordTranslatorRepository();
+
+    //reads json files to list
+    @GetMapping(path = "word")
+    public List<Word> getWordsCollection(@RequestParam String path) {
+        return wordTranslatorRepository.getWordsCollection(path);
+    }
+
     //gets word model for requested word and language
     @GetMapping(path = "translate/word/{language}/{word}")
     public String translateWord(@PathVariable String word, @PathVariable String language){
